@@ -45,7 +45,62 @@ var saveTasks = function() {
   localStorage.setItem("tasks", JSON.stringify(tasks));
 };
 
+// Clicking on a tasks Text
+$(".list-group").on("click", "p", function(){
+  let text = $(this).text();
+  let textInput = $("<textarea>")
+    .addClass("form-control")
+    .val(text);
+  $(this).replaceWith(textInput);
+  textInput.trigger("focus");
+  console.log(text);
+});
+$(".list-group").on("blur","textarea",function() {
+  let text = $(this).val().trim();
+  
+  let status = $(this)  //get parent ul's id attribute
+    .closest(".list-group")
+    .attr("id")
+    .replace("list-","");
 
+  let index = $(this)
+    .closest(".list-group-item")
+    .index();
+
+  tasks[status][index].text = text;
+  saveTasks();
+
+  let taskP = $("<p>")
+    .addClass("m-1")
+    .text(text);
+
+  $(this).replaceWith(taskP);
+});
+
+// Clicking on task's Date
+$(".list-group").on("click","span",function(){
+
+  var date = $(this).text().trim();
+  var dateInput = $("<input>").attr("type", "text").addClass("form-control").val(date);
+
+  $(this).replaceWith(dateInput);
+  dateInput.trigger("focus");
+});
+
+$(".list-group").on("blur","input[type='text']",function(){
+
+  console.log ("clicked off");
+  var date = $(this).val().trim();
+  let status = $(this).closest(".list-group").attr("id").replace("list-","");
+  let index = $(this).closest(".list-group-item").index();
+
+  tasks[status][index].date = date;
+  saveTasks();
+
+  var taskSpan = $("<span>").addClass("badge badge-primary badge-pill").text(date);
+  console.log(taskSpan);
+  $(this).replaceWith(taskSpan);
+});
 
 
 // modal was triggered
