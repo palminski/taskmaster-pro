@@ -10,6 +10,17 @@ var createTask = function(taskText, taskDate, taskList) {
     .addClass("m-1")
     .text(taskText);
 
+
+
+  // append span and p element to parent li
+  taskLi.append(taskSpan, taskP);
+
+  auditTask(taskLi);
+
+  // append to ul list on the page
+  $("#list-" + taskList).append(taskLi);
+};
+
 // Make draggable items
 $(".card .list-group").sortable({
   connectWith: $(".card .list-group"),
@@ -60,15 +71,7 @@ $(".card .list-group").sortable({
       console.log("out");
     }
   })
-  
 
-  // append span and p element to parent li
-  taskLi.append(taskSpan, taskP);
-
-
-  // append to ul list on the page
-  $("#list-" + taskList).append(taskLi);
-};
 
 var loadTasks = function() {
   tasks = JSON.parse(localStorage.getItem("tasks"));
@@ -136,10 +139,18 @@ $(".list-group").on("click","span",function(){
   var dateInput = $("<input>").attr("type", "text").addClass("form-control").val(date);
 
   $(this).replaceWith(dateInput);
+
+  dateInput.datepicker({
+    minDate: 0,
+    onClose: function() {
+      $(this).trigger("change");
+    }
+  });
+
   dateInput.trigger("focus");
 });
 
-$(".list-group").on("blur","input[type='text']",function(){
+$(".list-group").on("change","input[type='text']",function(){
 
   console.log ("clicked off");
   var date = $(this).val().trim();
@@ -152,6 +163,8 @@ $(".list-group").on("blur","input[type='text']",function(){
   var taskSpan = $("<span>").addClass("badge badge-primary badge-pill").text(date);
   console.log(taskSpan);
   $(this).replaceWith(taskSpan);
+
+  auditTask($(taskSpan).closest(".list-group-item"));
 });
 
 
@@ -189,6 +202,11 @@ $("#task-form-modal .btn-primary").click(function() {
   }
 });
 
+// Date picker in modal
+$("#modalDueDate").datepicker({
+  minDate: 0
+});
+
 // remove all tasks
 $("#remove-tasks").on("click", function() {
   for (var key in tasks) {
@@ -197,6 +215,22 @@ $("#remove-tasks").on("click", function() {
   }
   saveTasks();
 });
+
+let auditTask = function(taskEl) {
+  let date = $(taskEl).find("span").text().trim();
+  console.log(date);
+
+  let time = moment(date, "L").set("hour",17); // L is for Local Time
+  
+  $(taskEl).removeClass("list-group-item-warning list-group-item-danger");
+
+  if (moment().isAfter(time)) {
+    $(taskEl).addClass("list-group-item-danger");
+  }
+  else if (Math.abs(moment().diff(time, "days")) <= 2) {
+    $(taskEl).addClass("list-group-item-warning");
+  }
+};
 
 // load tasks for the first time
 loadTasks();
