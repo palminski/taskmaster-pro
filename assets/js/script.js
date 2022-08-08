@@ -10,6 +10,58 @@ var createTask = function(taskText, taskDate, taskList) {
     .addClass("m-1")
     .text(taskText);
 
+// Make draggable items
+$(".card .list-group").sortable({
+  connectWith: $(".card .list-group"),
+  scroll: false,
+  tolerance: "pointer",
+  helper: "clone",
+
+  update: function(event) {
+    var tempArr = [];
+
+    $(this).children().each(function() {
+      let text = $(this)
+      .find("p")
+      .text().
+      trim();
+
+      let date = $(this)
+      .find("span")
+      .text()
+      .trim();
+
+      tempArr.push({
+        text: text,
+        date: date
+      })
+    });
+    let arrName = $(this)
+      .attr("id")
+      .replace("list-","");
+
+    tasks[arrName] = tempArr;
+    saveTasks();
+  }
+});
+
+//Make Objects Droppable
+  $("#trash").droppable({
+    accept: ".card .list-group-item",
+    tolerance: "pointer",
+    drop: function(event,ui) {
+      console.log("drop");
+      ui.draggable.remove();
+    },
+    over: function(event,ui) {
+      console.log("over");
+    },
+    out: function(event,ui) {
+      console.log("out");
+    }
+  })
+  
+
   // append span and p element to parent li
   taskLi.append(taskSpan, taskP);
 
