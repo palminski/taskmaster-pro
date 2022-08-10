@@ -61,14 +61,14 @@ $(".card .list-group").sortable({
     accept: ".card .list-group-item",
     tolerance: "pointer",
     drop: function(event,ui) {
-      console.log("drop");
+
       ui.draggable.remove();
     },
     over: function(event,ui) {
-      console.log("over");
+
     },
     out: function(event,ui) {
-      console.log("out");
+
     }
   })
 
@@ -88,7 +88,7 @@ var loadTasks = function() {
 
   // loop over object properties
   $.each(tasks, function(list, arr) {
-    console.log(list, arr);
+
     // then loop over sub-array
     arr.forEach(function(task) {
       createTask(task.text, task.date, list);
@@ -108,7 +108,7 @@ $(".list-group").on("click", "p", function(){
     .val(text);
   $(this).replaceWith(textInput);
   textInput.trigger("focus");
-  console.log(text);
+
 });
 $(".list-group").on("blur","textarea",function() {
   let text = $(this).val().trim();
@@ -152,7 +152,7 @@ $(".list-group").on("click","span",function(){
 
 $(".list-group").on("change","input[type='text']",function(){
 
-  console.log ("clicked off");
+
   var date = $(this).val().trim();
   let status = $(this).closest(".list-group").attr("id").replace("list-","");
   let index = $(this).closest(".list-group-item").index();
@@ -161,7 +161,7 @@ $(".list-group").on("change","input[type='text']",function(){
   saveTasks();
 
   var taskSpan = $("<span>").addClass("badge badge-primary badge-pill").text(date);
-  console.log(taskSpan);
+
   $(this).replaceWith(taskSpan);
 
   auditTask($(taskSpan).closest(".list-group-item"));
@@ -218,7 +218,7 @@ $("#remove-tasks").on("click", function() {
 
 let auditTask = function(taskEl) {
   let date = $(taskEl).find("span").text().trim();
-  console.log(date);
+
 
   let time = moment(date, "L").set("hour",17); // L is for Local Time
   
@@ -230,9 +230,15 @@ let auditTask = function(taskEl) {
   else if (Math.abs(moment().diff(time, "days")) <= 2) {
     $(taskEl).addClass("list-group-item-warning");
   }
+
 };
 
 // load tasks for the first time
 loadTasks();
 
+setInterval(function () {
+  $(".card .list-group-item").each(function(index, el) {  //What is index doing here?
+    auditTask(el);
+  });
+}, 1800000);
 
